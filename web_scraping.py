@@ -14,6 +14,10 @@ if not downloads_directory.exists():
     downloads_directory.mkdir()
 
 chrome_options = Options()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--window-size=1920x1080")
+chrome_options.add_argument("--disable-notifications")
+chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--verbose')
 chrome_options.add_experimental_option("prefs", {
     "download.default_directory": path_downloads_directory,
@@ -23,6 +27,8 @@ chrome_options.add_experimental_option("prefs", {
     "plugins.always_open_pdf_externally": True,
     "safebrowsing.enabled": True
 })
+chrome_options.add_argument('--disable-gpu')
+chrome_options.add_argument('--disable-software-rasterizer')
 
 driver = webdriver.Chrome(options=chrome_options)
 driver.get(url_ipindia)
@@ -30,7 +36,7 @@ time.sleep(3)
 selector_number_entries = driver.find_element(By.XPATH, '//*[@id="Journal_length"]/label/select')
 Select(selector_number_entries).select_by_visible_text('All')
 
-first_row = 52
+first_row = 60
 last_row = 878
 
 table_rows = driver.find_elements(By.CSS_SELECTOR, 'tbody>tr')[first_row - 1:last_row]
