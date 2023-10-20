@@ -4,12 +4,11 @@ Since it has a complicated structure, there is a need to implement a specific cl
 """
 import re
 
-from pdf_classes.pdf_page import PdfPage
+from pdf_pages.basic_page import PdfPage
 
 
 class ContentsPage(PdfPage):
     """
-
     The `ContentsPage` class represents a contents page extracted from a PDF document. It extends the `PdfPage` class.
 
     Attributes:
@@ -77,7 +76,7 @@ class ContentsPage(PdfPage):
         last_page = self.limit_pages[self.categories[-2]][1]
         first_page_last_category = int(last_page) + 1
         formatted_page = str(first_page_last_category).zfill(len(last_page))
-        self.limit_pages[self.categories[-1]] = formatted_page, None
+        self.limit_pages[self.categories[-1]] = formatted_page, float('inf')
 
     @staticmethod
     def _get_first_and_last_pages(bounds: list):
