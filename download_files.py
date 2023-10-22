@@ -11,8 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 
 
-def format_date(date: str):
-    return datetime.strptime(date, "%d/%m/%Y").strftime("%Y-%m-%d")
+
 
 
 
@@ -68,7 +67,7 @@ class DownloaderDriver:
             The WebElement containing the record to be downloaded.
         """
         date_element = record.find_element(By.CSS_SELECTOR, 'td:nth-child(3)')
-        publication_date = format_date(date_element.text.strip())
+        publication_date = self._format_date(date_element.text.strip())
         print(f'Current row: {publication_date}\n')
         record_directory = self.prepare_record_directory(publication_date)
         pdf_links = record.find_elements(By.XPATH, './/td[last()]//button[@type="submit"]')
@@ -161,6 +160,9 @@ class DownloaderDriver:
         time.sleep(3)
         selector_number_entries = self.driver.find_element(By.XPATH, '//*[@id="Journal_length"]/label/select')
         Select(selector_number_entries).select_by_visible_text('All')
+
+    def _format_date(self, date: str):
+        return datetime.strptime(date, "%d/%m/%Y").strftime("%Y-%m-%d")
 
     def prepare_options(self):
         """
