@@ -2,12 +2,18 @@
 This script implements a class which handle the logic to download all the PDF files from the IPIndia website.
 """
 import time
+from datetime import datetime
 from pathlib import Path
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
+
+
+def format_date(date: str):
+    return datetime.strptime(date, "%d/%m/%Y").strftime("%Y-%m-%d")
+
 
 
 class DownloaderDriver:
@@ -61,39 +67,27 @@ class DownloaderDriver:
         record : WebElement
             The WebElement containing the record to be downloaded.
         """
-        first_field = record.find_element(By.CSS_SELECTOR, 'td:nth-child(1)')
-        serial_number = first_field.text.strip().zfill(3)
-        print(f'Current row: {serial_number}\n')
-        record_directory = self.prepare_record_directory(serial_number)
+        date_element = record.find_element(By.CSS_SELECTOR, 'td:nth-child(3)')
+        publication_date = format_date(date_element.text.strip())
+        print(f'Current row: {publication_date}\n')
+        record_directory = self.prepare_record_directory(publication_date)
         pdf_links = record.find_elements(By.XPATH, './/td[last()]//button[@type="submit"]')
         for pdf_counter, pdf_element in enumerate(pdf_links, start=1):
             print(f'File number {pdf_counter}\n')
             self.process_pdf_element(pdf_element, record_directory)
             print('-' * 30 + '\n')
 
-    def prepare_record_directory(self, serial_num: str):
+    def prepare_record_directory(self, date: str):
         """
         Creates the directory for the given record through its serial number.
-
-        Parameters
-        ----------
-        serial_num: str
-            The serial number used to create the record directory.
-
-        Returns
-        -------
-        directory: pathlib.Path
-            The created record directory.
-
         Raises
         ------
         FileExistsError
             If the directory for the given serial number already exists.
         """
-        assert len(serial_num) == 3, 'The serial number must have 3 digits'
-        directory = self.downloads_directory / serial_num / 'pdf'
+        directory = self.downloads_directory / date / 'pdf'
         if directory.exists():
-            print(f'Row {serial_num} already exists')
+            print(f'Row {date} already exists')
             raise FileExistsError
         else:
             directory.mkdir(parents=True)
@@ -194,6 +188,6 @@ class DownloaderDriver:
 
 
 if __name__ == '__main__':
-    downloader = DownloaderDriver(first_record=136, last_record=878)
+    downloader = DownloaderDriver(first_record=1, last_record=50)
     downloader.visit_ipindia()
     downloader.download_records()
