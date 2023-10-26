@@ -5,7 +5,7 @@ from pathlib import Path
 class UnZip:
     def __init__(self, id_num: int):
         self.id = str(id_num).zfill(3)
-        self.id_zip = (Path('files') / self.id).with_suffix('.zip')
+        self.id_zip = (Path('../files') / self.id).with_suffix('.zip')
         self.id_dir = self.id_zip.parent / self.id
         self.pdf_zip = (self.id_dir / 'pdf').with_suffix('.zip')
         self.csv_zip = (self.id_dir / 'csv').with_suffix('.zip')

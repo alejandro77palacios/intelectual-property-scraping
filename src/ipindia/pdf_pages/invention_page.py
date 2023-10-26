@@ -1,7 +1,7 @@
 import re
 
-from cleaning import SimpleFieldsCleaner, ProblematicFieldsCleaner
-from pdf_pages.basic_page import PdfPage
+from ipindia.cleaning import SimpleFieldsCleaner, ProblematicFieldsCleaner
+from ipindia.pdf_pages.basic_page import PdfPage
 
 
 class InventionPage(PdfPage):

@@ -1,0 +1,8 @@
+name: myenv
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - pandas
+  - mamba
+  - camelot-py

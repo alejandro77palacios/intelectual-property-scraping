@@ -9,7 +9,7 @@ class PdfPage:
     A class to represent a PDF page.
     It is intended to be inherited by other classes that represent specific PDF pages.
     """
-    page_number_pattern = re.compile(r'(\d{3,})[a-zA-Z\s]*\Z')
+    page_number_pattern = re.compile(r'(\d{1,})[a-zA-Z\s]*\Z')  # TODO: before \d{3,}
 
     def __init__(self, text):
         """
@@ -41,11 +41,12 @@ class PdfPage:
         -------
         str or int
         """
-        page_number_match = self.page_number_pattern.search(self.text)
+        clean_text = re.sub(r'The Patent Office Journal(No.*Dated)?\s+\d{2}/\d{2}/\d{4}', '', self.text)
+        page_number_match = self.page_number_pattern.search(clean_text.strip())
         try:
             number = page_number_match.group(1)
             if as_int:
                 return int(number)
             return number
         except AttributeError:
-            return None
+            raise ValueError('Page number not found')

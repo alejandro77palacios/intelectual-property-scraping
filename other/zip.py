@@ -5,7 +5,7 @@ from pathlib import Path
 class Zip:
     def __init__(self, id_num: int):
         self.id = str(id_num).zfill(3)
-        self.directory_id = Path('files') / self.id
+        self.directory_id = Path('../files') / self.id
         self.directory_pdf = self.directory_id / 'pdf'
         self.directory_csv = self.directory_id / 'csv'
         self.validate()
@@ -22,11 +22,11 @@ class Zip:
         # for dir in (self.directory_pdf, self.directory_id):
         #     self.zip_dir(dir)
         self.zip_dir(self.directory_pdf)
-        new = Path('files') / 'new'
+        new = Path('../files') / 'new'
         new.mkdir()
         shutil.move(self.directory_id, new)
         shutil.make_archive(str(new), 'zip', new)
-        zip_result = Path('files') / 'new.zip'
+        zip_result = Path('../files') / 'new.zip'
         zip_result.rename(self.directory_id.parent / f'{self.id}.zip')
         shutil.rmtree(new)
 

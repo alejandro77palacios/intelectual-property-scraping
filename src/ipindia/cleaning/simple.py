@@ -70,6 +70,8 @@ class SimpleFieldsCleaner:
 
     def clean_abstract(self):
         text = self.raw_data['Abstract']
+        if text is None:
+            return None
         first_part = text.split('No. of Pages')[0].strip()
         cleaned = re.sub(r'^Abstract[\s.,:]*', '', first_part, flags=re.IGNORECASE)
         return re.sub(r'\s+', ' ', cleaned).strip()
@@ -87,10 +89,13 @@ class SimpleFieldsCleaner:
         return self._re_structure_people(all_applicants)
 
     def _process_people(self, people_field: str):
-        list_people = re.split(r'\d+\)\s*', self._find_field_data(people_field))[1:]
+        people_field_data = self._find_field_data(people_field)
+        if people_field_data is None:
+            return []
+        list_people = re.split(r'\d+\)\s*', people_field_data)[1:]
         values = []
         for person in list_people:
-            all_data = [re.sub(r'\s', ' ', p).strip() for p in person.split('Address of Applicant')]
+            all_data = [re.sub(r'\s', ' ', p).strip() for p in person.split('Address of Applicant') if p is not None]
             if len(all_data) >= 2:
                 name, address = all_data[:2]
                 name = re.sub(r'\s*:\s*NA\s*', ' ', name)
@@ -107,9 +112,21 @@ class SimpleFieldsCleaner:
         return values
 
     def _re_structure_people(self, all_people):
-        app_key = 'Application No.'
-        return [{'name': name, 'address': address, app_key: self.clean_application_no()} for name, address in
-                all_people]
+        return [{
+            'Application No.': self.clean_application_no(),
+            'name': name,
+            'address': address,
+            'pincode': self._get_pincode(address),
+        } for name, address in all_people]
+
+    def _get_pincode(self, address):
+        if address is None:
+            return None
+        matches = re.findall(r'\d{6}', address)
+        if matches:
+            return matches[-1]
+        else:
+            return None
 
     # ------------------------------
     # Sub fields
@@ -122,6 +139,8 @@ class SimpleFieldsCleaner:
         return self._clean_subfield_abstract(r'No\. of Claims\s*:\s*(\d+)')
 
     def _clean_subfield_abstract(self, pattern):
+        if self.raw_data['Abstract'] is None:
+            return None
         match = re.search(pattern, self.raw_data['Abstract'])
         return match.group(1) if match else None
 
@@ -138,8 +157,10 @@ class SimpleFieldsCleaner:
             return self.raw_data[field]
 
     @staticmethod
-    def _safe_extract(texto, pattern):
-        match = re.search(pattern, texto)
+    def _safe_extract(text, pattern):
+        if text is None:
+            return None
+        match = re.search(pattern, text)
         return match.group(0) if match else None
 
     def _find_field_data(self, field: str):

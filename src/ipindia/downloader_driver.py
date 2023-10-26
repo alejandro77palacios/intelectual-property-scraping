@@ -11,20 +11,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 
 
-
-
-
-
 class DownloaderDriver:
     """
     Class to download files from a web table using Selenium WebDriver.
     It handles the download of all the PDF files.
     """
     url_ipindia = 'https://search.ipindia.gov.in/IPOJournal/Journal/Patent'
-    path_downloads_directory = '/Users/alejandropalacios/programacion/freelancer/ipindia/files'
-    downloads_directory = Path(path_downloads_directory)
 
-    def __init__(self, first_record=1, last_record=878):
+    def __init__(self, first_record=1, last_record=878, path_downloads_directory=None):
         """
         Parameters
         ----------
@@ -33,6 +27,8 @@ class DownloaderDriver:
         last_record: int, optional
             The last record to download. The default is 878.
         """
+        self.path_downloads_directory = path_downloads_directory
+        self.downloads_directory = Path(self.path_downloads_directory)
         self.driver = webdriver.Chrome(options=self.prepare_options())
         self.first_record = first_record
         self.last_record = last_record
@@ -188,8 +184,3 @@ class DownloaderDriver:
         })
         return chrome_options
 
-
-if __name__ == '__main__':
-    downloader = DownloaderDriver(first_record=1, last_record=50)
-    downloader.visit_ipindia()
-    downloader.download_records()
